@@ -29,16 +29,16 @@
             </div>
             <p class="text-2xl">Sign up</p>
             <p class="text-xs text-[#8f8f8f] mb-5">Enter you details below to create an account and get started.</p>
-            <form action="{{route('signup.post')}}" method="POST" class="w-full text-sm">
+            <form action="{{route('retailer.signup')}}" method="POST" class="w-full text-sm">
                 @csrf
                 <div class="w-full flex items-center gap-5 mb-8">
                     <div class="w-1/4 flex flex-col">
                         <label for="" class="">First Name</label>
-                        <input type="text" name="full_name" class="w-full outline-none rounded-md border border-[#cccbcb] p-2 focus:border focus:border-[#9ee4d7] ease-in-out transition duration-100">
+                        <input type="text" name="first_name" class="w-full outline-none rounded-md border border-[#cccbcb] p-2 focus:border focus:border-[#9ee4d7] ease-in-out transition duration-100">
                     </div>
                     <div class="w-1/4 flex flex-col">
                         <label for="" class="">Last Name</label>
-                        <input type="text" name="full_name" class="w-full outline-none rounded-md border border-[#cccbcb] p-2 focus:border focus:border-[#9ee4d7] ease-in-out transition duration-100">
+                        <input type="text" name="last_name" class="w-full outline-none rounded-md border border-[#cccbcb] p-2 focus:border focus:border-[#9ee4d7] ease-in-out transition duration-100">
                     </div>
                     <div class="w-1/2 flex flex-col">
                         <label for="" class="">Email Address</label>

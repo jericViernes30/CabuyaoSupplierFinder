@@ -32,7 +32,7 @@
                 <div class="w-full flex items-center justify-between mb-10">
                 </div>
                 <div class="w-full">
-                    <form action="" class="w-1/2 bg-[#f4fcfa] shadow-xl p-10 rounded-2xl">
+                    <form action="{{route('dealer.product.add')}}" class="w-1/2 bg-[#f4fcfa] shadow-xl p-10 rounded-2xl" method="POST">
                         @csrf
                         <div>
                             <p class="mb-6">Rice Details</p>
@@ -64,8 +64,10 @@
                                     <input type="number" name="quantity" id="quantity" value="1" class="px-4 py-2 rounded-md border border-gray-400 outline-none text-center bg-white-v2">
                                 </div>
                             </div>
-                            <button class="px-16 text-sm py-2 rounded-md bg-main">Add</button>
-                            <button class="underline text-sm ml-4">Clear</button>
+                            <input type="hidden" name="dealer" value="{{ session('dealer')->business_name }}">
+                            <input type="hidden" name="address" value="{{ session('dealer')->address }}">
+                            <button type="sumit" class="px-16 text-sm py-2 rounded-md bg-main">Add</button>
+                            <button type="button" class="underline text-sm ml-4">Clear</button>
                         </div>
                     </form>
                 </div>

@@ -20,7 +20,7 @@
         <div class="w-[86%] h-full">
             <div class="w-full flex items-center justify-end h-[10%]">
                 <div class="w-[15%] text-center">
-                    <button class="text-white text-sm py-2 px-5 bg-[#383535] rounded-full">Lim Rice Trading</button>
+                    <button class="text-white text-sm py-2 px-5 bg-[#383535] rounded-full">{{ session('dealer')->business_name }}</button>
                 </div>
             </div>
             <div class="w-full p-7 h-[90%]">

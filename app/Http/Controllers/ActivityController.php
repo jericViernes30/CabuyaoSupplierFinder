@@ -17,4 +17,8 @@ class ActivityController extends Controller
     public function loginPage(){
         return view('login');
     }
+
+    public function dealerLogin(){
+        return view('dealer_login');
+    }
 }

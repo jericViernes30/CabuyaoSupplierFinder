@@ -12,8 +12,8 @@ class Rice extends Model
     protected $fillable = [
         'name',
         'per_sack',
-        'per_kg',
         'price_bought',
+        'quantity',
         'address',
         'quality',
         'dealer',

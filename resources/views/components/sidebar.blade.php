@@ -24,16 +24,16 @@
         {{-- Orders Link --}}
         <button onclick="window.location.href='{{route('dealer.orders')}}'" class="py-2 w-full text-left pl-10 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17" fill="{{ Request::is('dealer/orders*') ? '#95e1d4' : '#000' }}">
-                <path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/>
+                <path d="M384 96l0 128-128 0 0-128 128 0zm0 192l0 128-128 0 0-128 128 0zM192 224L64 224 64 96l128 0 0 128zM64 288l128 0 0 128L64 416l0-128zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"/>
             </svg>
             <p class="font-normal {{ Request::is('dealer/orders*') ? 'text-main' : '' }}">Orders</p>
         </button>
         {{-- Orders Link --}}
-        <button onclick="window.location.href='{{route('dealer.orders')}}'" class="py-2 w-full text-left pl-10 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17" fill="{{ Request::is('dealer/orders*') ? '#95e1d4' : '#000' }}">
+        <button onclick="window.location.href='{{route('dealer.history')}}'" class="py-2 w-full text-left pl-10 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17" fill="{{ Request::is('dealer/history*') ? '#95e1d4' : '#000' }}">
                 <path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/>
             </svg>
-            <p class="font-normal {{ Request::is('dealer/orders*') ? 'text-main' : '' }}">History</p>
+            <p class="font-normal {{ Request::is('dealer/history*') ? 'text-main' : '' }}">History</p>
         </button>
     </div>
 </div>

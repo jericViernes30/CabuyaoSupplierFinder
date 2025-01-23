@@ -24,6 +24,7 @@
             <p><strong>Retailer name:</strong><span id="retailer_name"></span></p>
             <p><strong>Business name:</strong><span id="business_name"></span></p>
             <p><strong>Business address:</strong><span id="business_address"></span></p>
+            <p><strong>Delivery date:</strong><span id="delivery_date"></span></p>
             <div id="ordersContainer" class="">
                 <p id="sack_count"></p>
                 <p id="rice_name"></p>
@@ -36,9 +37,37 @@
             <div class="w-full mb-4 border-b border-gray-400">
             </div>
             <div class="w-full flex justify-end">
-                <input id="rice_id" type="hidden" name="rice_id">
-                <input id="user_id" type="hidden" name="user_id">
-                <button id="order_delivered" type="button" class="py-2 px-10 bg-[#3b5a54] rounded-lg uppercase text-sm text-white">Order's Delivered</button>
+                <input id="rice_id" type="hidden" name="order_id">
+                <button id="process_order" type="button" class="hidden py-2 px-10 bg-[#3b5a54] rounded-lg uppercase text-sm text-white">Process Order</button>
+                <script>
+                    $('#process_order').on('click', function() {
+                        const orderId = $('#rice_id').val();
+                        alert(orderId)
+                        if (orderId) {
+                            $.ajax({
+                                url: '{{ route('dealer.order.processed') }}',
+                                method: 'POST',
+                                data: {
+                                    order_id: orderId,
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    alert('Order marked as processed');
+                                    window.location.href = 'http://127.0.0.1:8000/dealer/orders';
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('Error: ' + error);
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                }
+                            });
+                        } else {
+                            alert('Missing required data');
+                        }
+                    });
+                </script>
+                <button id="order_delivered" type="button" class="hidden py-2 px-10 bg-[#3b5a54] rounded-lg uppercase text-sm text-white">Order's Delivered</button>
             </div>
         </div>
     </div>
@@ -47,7 +76,11 @@
         <div class="w-[86%] h-full">
             <div class="w-full flex items-center justify-end h-[10%]">
                 <div class="w-[15%] text-center">
-                    <button class="text-white-v2 text-sm py-2 px-5 bg-black-v2 rounded-full">Lim Rice Trading</button>
+                    @if(session()->has('dealer'))
+                        <button class="text-white-v2 text-sm py-2 px-5 bg-black-v2 rounded-full">
+                            {{ session('dealer.business_name') }}
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="w-full p-7 h-[90%]">
@@ -63,11 +96,14 @@
                         <p class="w-[20%] text-center">Order date</p>
                     </div>
                     @foreach($data as $orderData)
-                        <button data-name="{{ $orderData['first_name'] }}" id="orderDetails" class="w-full flex items-center p-2 border-b text-left">
+                        <button data-order="{{ $orderData['order_id'] }}" id="orderDetails" class="w-full flex items-center p-2 border-b text-left">
                                 <p class="w-[20%]">{{ $orderData['business_name'] }}</p>
                                 <p class="w-[20%]">{{ $orderData['order_count'] }}</p>
                                 <p class="w-[20%]">{{ number_format($orderData['total_price'], 2) }}</p>
-                                <p class="w-[20%]">{{ $orderData['requested_delivery_date'] }}</p>
+                                <p class="w-[20%]">
+                                    {{ \Carbon\Carbon::parse($orderData['requested_delivery_date'])->format('F d, Y') }}
+                                </p>
+                                
                                 <p class="w-[20%] text-center">{{ $orderData['order_date'] }}</p>
                         </button>
                     @endforeach
@@ -81,28 +117,39 @@
             $(document).on('click', '#orderDetails', function () {
                 $('#details_div').removeClass('hidden')
                 $('#overlay').removeClass('hidden')
-                var name = $(this).data('name');
+                var orderID = $(this).data('order');
+                // alert(orderID)
 
                 $.ajax({
                     url: '{{ route('dealer.order.details') }}',
                     type: 'POST',
                     data: {
-                        name: name,
+                        orderID: orderID,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
+                        console.log(response);
                         const ordersContainer = $('#ordersContainer');
                         ordersContainer.empty();
 
                         let grandTotal = 0;
 
+                        if(response.orders[0].status == 'Order Placed') {
+                            $('#process_order').removeClass('hidden');
+                        } else {
+                            $('#order_delivered').removeClass('hidden');
+                        }
+
                         $('#retailer_name').text(' ' + response.retailer.first_name + ' ' + response.retailer.last_name);
                         $('#business_name').text(' ' + response.retailer.business_name);
                         $('#business_address').text(' ' + response.retailer.address);
+                        $('#delivery_date').text(' ' + response.orders[0].delivery_date);
+                        alert(response.orders)
                         $('#user_id').val(response.retailer.id)
 
                         response.orders.forEach(order => {
-                            $('#rice_id').val(order.rice_id)
+                            $('#rice_id').val(order.order_id)
+                            // alert(order.order_id)
                             const orderHTML = `
                                 <div class="order-item my-2 p-4 border rounded flex items-center justify-between">
                                     <p>${order.sack_count}</p>
@@ -124,19 +171,19 @@
             });
 
             $('#order_delivered').on('click', function() {
-                const riceId = $('#rice_id').val();
-                const userId = $('#user_id').val();
-                if (riceId && userId) {
+                const orderId = $('#rice_id').val();
+                alert(orderId)
+                if (orderId) {
                     $.ajax({
                         url: '{{ route('dealer.order.delivered') }}',
                         method: 'POST',
                         data: {
-                            rice_id: riceId,
-                            user_id: userId,
+                            orderId: orderId,
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
                             alert('Order marked as delivered');
+                            window.location.href = 'http://127.0.0.1:8000/dealer/orders';
                         },
                         error: function(xhr, status, error) {
                             alert('Error: ' + error);

@@ -68,6 +68,9 @@
             Order Details
         </div>
         <div class="w-full p-6 bg-white rounded-bl-xl rounded-br-xl">
+            <div>
+                <p id="rice_name" class="text-xl font-semibold uppercase">Jillian Rice</p>
+            </div>
             <p id="rice_name" class="text-xl font-semibold uppercase">Jillian Rice</p>
             <p class="">Per sack: &#8369;<span id="price_sack"></span></p>
             <p class="mb-4">Per kg: &#8369;<span id="price_kg"></span></p>
@@ -99,6 +102,7 @@
                     </div>
                     <div id="btn_div" class="hidden w-full justify-end">
                             <input id="rice_id" type="hidden" name="rice_id">
+                            <input id="dealer_id" type="hidden" name="dealer_id">
                             <input type="hidden" name="user_id" value="{{ session('profile')->id }}">
                             <button type="submit" class="py-2 px-10 rounded-md bg-[#9ee4d7]">Add to Orders</button>
                     </div>
@@ -125,7 +129,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="17" height="17"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 96l0 128-128 0 0-128 128 0zm0 192l0 128-128 0 0-128 128 0zM192 224L64 224 64 96l128 0 0 128zM64 288l128 0 0 128L64 416l0-128zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"/></svg>
                     <p class="font-light">Orders</p>
                 </button>
-                <button class="py-2 w-full text-left pl-10 flex items-center gap-2">
+                <button onclick="window.location.href='{{route('retailer.history')}}'" class="py-2 w-full text-left pl-10 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17"><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/></svg>
                     <p class="font-light">History</p>
                 </button>
@@ -171,27 +175,28 @@
                             data-id="{{$r->id}}"
                             data-name="{{ $r->name }}" 
                             data-per-sack="{{ $r->per_sack }}" 
-                            data-per-kg="{{ $r->per_kg }}" 
+                            data-per-kg="{{ $r->per_kg }}"
+                            data-dealer="{{ $r->dealer }}"
                         >
                             <div class="w-full bg-[#e7e5e5] p-5 rounded-tl-lg rounded-tr-lg">
                                 <img src="{{ asset('images/' . $r->image_name . '.png') }}" alt="" class="w-1/2 block mx-auto">
                             </div>
                             <div class="w-full bg-white p-5 rounded-bl-lg rounded-br-lg text-left hover:bg-[#bae6de] transition duration-100 ease-in-out">
                                 <p id="name" class="text-left text-[#383737] text-sm mb-2 font-semibold uppercase">{{ $r->name }}</p>
-                                <div class="w-full flex gap-4 items-center">
+                                <div class="w-full flex gap-10 items-center">
                                     <div class="w-1/2">
                                         <p class="text-xs">Per sack</p>
                                         <p class="text-2xl mb-2">&#8369;<span id="per_sack">{{$r->per_sack}}</span>.00</p>
                                     </div>
                                     <div class="w-1/2">
-                                        <p class="text-xs">Per kg</p>
-                                        <p class="text-2xl mb-2">&#8369;<span id="per_kg">{{$r->per_kg}}</span>.00</p>
+                                        <p class="text-xs">Sacks left</p>
+                                        <p class="text-2xl mb-2"><span id="per_kg">{{$r->quantity}}</span></p>
                                     </div>
                                 </div>
-                                <p class="text-xs text-[#383737] mb-5">{{$r->address}}</p>
                                 <p class="text-xs uppercase font-medium pb-3 border-b border-[#b3b0b0]">{{$r->quality}}</p>
                                 <p class="mt-3 text-xs mb-1">Dealer:</p>
                                 <p class="text-md uppercase font-medium">{{$r->dealer}}</p>
+                                <p class="text-xs text-[#383737] mb-1">{{$r->address}}</p>
                             </div>
                         </button>
                     @endforeach
@@ -303,8 +308,10 @@
                 var quality = $(this).data('quality');
                 var dealer = $(this).data('dealer');
                 var riceID = $(this).data('id')
+                // alert(dealer)
 
                 $('#rice_id').val(riceID);
+                $('#dealer_id').val(dealer);
                 // Update the order details div
                 $('#rice_name').text(name);
                 $('#price_sack').text(perSack + '.00');

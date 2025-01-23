@@ -32,21 +32,27 @@
                         Add Stocks
                     </button>
                 </div>
-                <div class="w-full">
+                <div class="w-[80%]">
                     <div class="w-full flex items-center bg-[#3b5a54] py-2 text-white-v2 px-3">
-                        <p class="w-[40%]">Name</p>
+                        <p class="w-[35%]">Name</p>
                         <p class="w-[20%]">Quality</p>
-                        <p class="w-[15%] text-right">Price / kg (₱)</p>
-                        <p class="w-[15%] text-right">Price / sack (₱)</p>
-                        <p class="w-[10%] text-right">In Stocks</p>
+                        <p class="w-[15%]">Price / sack (₱)</p>
+                        <p class="w-[10%]">In Stocks</p>
+                        <div class="w-[20%]"></div>
                     </div>
-                    <div class="w-full flex items-center px-3 py-4 border-b border-black-v2 hover:bg-[#e9f9f6] hover:cursor-pointer">
-                        <p class="w-[40%] uppercase">Jillian Rice</p>
-                        <p class="w-[20%] uppercase">Well Milled Rice</p>
-                        <p class="w-[15%] text-right">52</p>
-                        <p class="w-[15%] text-right">1200</p>
-                        <p class="w-[10%] text-right">26</p>
-                    </div>
+                    @foreach ($rice as $r)
+                        <div class="w-full flex items-center px-3 py-4 border-b border-black-v2 hover:bg-[#e9f9f6] hover:cursor-pointer">
+                            <p class="w-[35%] uppercase">{{$r->name}}</p>
+                            <p class="w-[20%] uppercase">{{$r->quality}}</p>
+                            <p class="w-[15%]">{{$r->per_sack}}</p>
+                            <p class="w-[10%]">{{$r->quantity}}</p>
+                            <div class="w-[20%] flex items-center justify-end gap-4">
+                                <button class="text-white-v2 bg-black-v2 px-3 py-1 rounded-sm">Edit</button>
+                                <button onclick="window.location.href='rice/delete/{{$r->id}}'" class="text-white-v2 bg-red-500 px-3 py-1 rounded-sm">Delete</button>
+                            </div>
+                        </div>
+                    @endforeach
+                    
                 </div>
             </div>
         </div>

@@ -67,28 +67,31 @@
                 <div class="mt-10">
                     <form action="{{ route('retailer.order.add') }}" method="POST" class="w-full flex gap-10">
                         @csrf
-                        <div class="w-3/4">
+                        <div class="w-full">
                             @if ($orderDetails->isEmpty())
                                 <p class="text-center my-5">No orders in cart yet.</p>
                             @else
                                 @foreach ($orderDetails as $order)
                                     <div class="w-full flex items-center my-5">
                                         <img src="{{ asset('images/' . $order['image_name'] . '.png') }}" alt="" class="w-[10%]">
-                                        <div class="w-[41%] flex flex-col gap-2 pl-16">
+                                        <div class="w-[25%] flex flex-col gap-2 pl-16">
                                             <p class="text-lg">{{ $order['rice_name'] }}</p> 
                                             <p class="text-xs">{{ $order['order_type'] == 'per_sack' ? 'Per Sack' : 'Per KG' }}</p>
                                         </div>
                                         <p class="w-[17%] text-center">{{ $order['order_type'] == 'per_sack' ? number_format($order['price_per_sack'], 2) : number_format($order['price_per_kg'], 2) }}</p>
                                         <p class="w-[5%] text-center">{{ $order['count'] }}</p>
                                         <p class="w-[17%] pl-4 text-center">{{ number_format($order['total_price'], 2) }}</p>
-                                        <p class="w-[15%] 
-                                            @if($order['status'] == 'On Process') 
-                                                text-red-500 !important
-                                            @else 
+                                        <p class="w-[31%] 
+                                            @if($order['status'] == 'Processing Order') 
+                                                text-blue-500 !important
+                                            @elseif($order['status'] == 'Delivered')
                                                 text-green-500 !important
+                                            @else 
+                                                text-orange-500 !important
                                             @endif
+                                            text-sm
                                         ">
-                                            {{ $order['status'] }}
+                                            {{ $order['status'] }} <span class="text-black"> on {{$order['placed_at']}}</span>
                                         </p>
 
 

@@ -31,7 +31,7 @@
                 </div>
                 <div class="w-full flex items-center justify-between mb-10">
                 </div>
-                <div class="w-full">
+                <div class="w-[full]">
                     <form action="{{route('dealer.product.add')}}" class="w-1/2 bg-[#f4fcfa] shadow-xl p-10 rounded-2xl" method="POST">
                         @csrf
                         <div>
@@ -50,10 +50,6 @@
                                 <div class="w-[21%] flex flex-col gap-2">
                                     <label for="" class="text-sm font-medium">Price / sack*</label>
                                     <input type="number" name="sack_price" value="0" class="px-4 py-2 rounded-md border border-gray-400 outline-none bg-white-v2 text-center">
-                                </div>
-                                <div class="w-[21%] flex flex-col gap-2">
-                                    <label for="" class="text-sm font-medium">Price / kg*</label>
-                                    <input type="number" name="kg_price" value="0" class="px-4 py-2 rounded-md border border-gray-400 outline-none bg-white-v2 text-center">
                                 </div>
                                 <div class="w-[21%] flex flex-col gap-2">
                                     <label for="" class="text-sm font-medium">Price bought*</label>

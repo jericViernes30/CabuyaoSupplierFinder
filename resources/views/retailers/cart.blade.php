@@ -60,8 +60,9 @@
                 </button>
             </div>
             <div class="w-full p-7 h-[90%]">
-                <div class="w-full flex items-center justify-between mb-10">
-                    <p class="text-xl font-medium">Cart</p>
+                <div class="w-full flex flex-col justify-between mb-10">
+                    <p class="text-xl font-medium">Cart </p>
+                    {{-- <p class="text-red-500">Order ID: <span class="text-black">{{$orderID}}</span></p> --}}
                 </div>
                 <hr>
                 <div class="mt-10">
@@ -70,10 +71,14 @@
                         <div class="w-3/4">
                             @if ($orderDetails->isEmpty())
                                 <p class="text-center my-5">No orders in cart yet.</p>
+                                <script>
+                                    $(document).ready(function () {
+                                            $('#delivery_date').addClass('hidden');
+                                    });
+                                </script>
                             @else
                                 @foreach ($orderDetails as $order)
                                     <div class="w-full flex items-center my-5">
-                                        <input type="checkbox" class="order-checkbox w-[10%]" name="orders[{{ $order['rice_id'] }}][rice_id]" value="{{ $order['rice_id'] }}">
                                         <img src="{{ asset('images/' . $order['image_name'] . '.png') }}" alt="" class="w-[10%]">
                                         <div class="w-[41%] flex flex-col gap-2 pl-16">
                                             <p class="text-lg">{{ $order['rice_name'] }}</p> 
@@ -92,8 +97,9 @@
 
                         </div>
                     
-                        <div class="w-1/4 p-2">
+                        <div id="delivery_date" class="w-1/4 p-2">
                             <p class="mb-1">Select date of Delivery</p>
+                            <input type="hidden" name="order_id" value="{{$orderID}}">
                             <input id="delivery_date" type="date" name="delivery_date" class="w-full p-2 rounded-lg outline-none border border-gray-400 mb-3">
                             <button id="placeOrderBtn" type="submit" class="w-full py-2 bg-[#9ee4d7] rounded-lg">Place Order</button>
                         </div>

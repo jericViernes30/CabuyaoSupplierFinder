@@ -39,19 +39,19 @@
                             <p>Grains on sale</p>
                         </div>
                         <div class="w-1/4 flex flex-col items-center py-10 justify-center shadow-md rounded-lg bg-[#c6e1e9]">
-                            <p class="text-5xl font-semibold">25</p>
+                            <p class="text-5xl font-semibold">{{$status['pendingOrders']}}</p>
                             <p>Pending Orders</p>
                         </div>
                         <div class="w-1/4 flex flex-col items-center py-10 justify-center shadow-md rounded-lg bg-[#c6e1e9]">
-                            <p class="text-5xl font-semibold">646</p>
+                            <p class="text-5xl font-semibold">{{$status['sacks']}}</p>
                             <p>Rice Sacks Sold</p>
                         </div>
                         <div class="w-1/4 flex flex-col items-center py-7 justify-center shadow-md rounded-lg bg-[#c6e1e9]">
                             <div class="w-full flex items-center justify-center gap-2">
-                                <p class="text-5xl font-semibold">76503</p>
+                                <p class="text-5xl font-semibold">{{$status['profit']}}</p>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="#22c55e"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/></svg>
                             </div>
-                            <p class="text-sm text-green-500">123% higher than previous</p>
+                            <p class="text-sm text-green-500">{{$status['profitChange']}}% higher than previous</p>
                             <p>Total Profit</p>
                         </div>
                     </div>
@@ -76,27 +76,38 @@
         };
 
         const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                datasets: [{
-                    label: 'Sales Total',
-                    data: generateRandomSales(),
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10000
-                    }
-                }
+
+// Your monthly sales data
+const monthlySales = <?php echo json_encode($monthlySales); ?>;
+
+const salesData = Object.values(monthlySales); // Get the values from the associative array
+const months = Object.keys(monthlySales); // Get the keys (months) from the associative array
+console.log(months);
+// Create the chart
+const salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: months, // ['January', 'February', ..., 'December']
+        datasets: [{
+            label: 'Sales Total',
+            data: salesData, // Corresponding sales data
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 10000
             }
-        });
+        }
+    }
+});
+
+
+
 
         const generateRandomSacks = () => {
             return Array.from({ length: 10 }, () => Math.floor(Math.random() * (250 - 100 + 1)) + 100);

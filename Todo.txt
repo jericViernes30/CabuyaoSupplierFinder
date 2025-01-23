@@ -1,0 +1,11 @@
+Retailer Orders / History
+    - When clicked, show details of the transaction: Order Placed on, Order Processed on, Order Delivered on
+
+Retailer Profile
+Dealer Profile
+
+Dealer Signup
+
+Rice Filter
+
+Place Order button in Retailer Dashboard

@@ -27,7 +27,10 @@ Route::get('/dealer/add-product', [DealerController::class, 'addProductView'])->
 Route::get('/dealer/orders', [DealerController::class, 'orders'])->name('dealer.orders');
 Route::post('/dealer/order-details', [DealerController::class, 'getOrderDetails'])->name('dealer.order.details');
 Route::post('/dealer/mark-order-delivered', [DealerController::class, 'markOrderDelivered'])->name('dealer.order.delivered');
+Route::post('/dealer/mark-order-processed', [DealerController::class, 'processOrder'])->name('dealer.order.processed');
 Route::post('/dealer/add-product', [ProductController::class, 'addProduct'])->name('dealer.product.add');
+Route::get('/dealer/rice/delete/{id}', [DealerController::class, 'deleteRiceItem']);
+Route::get('/dealer/history', [DealerController::class, 'history'])->name('dealer.history');
 
 
 
@@ -45,3 +48,4 @@ Route::get('/retailer/cart', [RetailerController::class, 'cart'])->name('retaile
 Route::get('/retailer/orders', [RetailerController::class, 'orders'])->name('retailer.order');
 Route::get('/retailer/rice/live-search', [ProductController::class, 'liveSearch'])->name('rice.livesearch');
 Route::POST('/retailer/distance', [RetailerController::class, 'filterRiceItems'])->name('retailer.distance');
+Route::get('/retailer/history', [RetailerController::class, 'history'])->name('retailer.history');

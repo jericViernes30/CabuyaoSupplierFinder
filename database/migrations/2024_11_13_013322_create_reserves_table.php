@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reserves', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
+            $table->string('order_id');
             $table->string('delivery_date');
             $table->timestamps();
         });

@@ -9,13 +9,13 @@ use App\Models\Rice;
 class ProductController extends Controller
 {
     public function addProduct(Request $request){
-        $dealerID = session('dealer')->id;
+        $dealerID = session('dealer')->business_name;
         $validatedData = $request->validate([
             'dealer' => 'required|string|max:255',
             'rice_name' => 'required|string|max:255',
             'quality' => 'required|string|max:255',
             'sack_price' => 'required|numeric|min:0',
-            'kg_price' => 'required|numeric|min:0',
+            'quantity' => 'required|numeric|min:0',
             'buy_price' => 'required|numeric|min:0',
             'quantity' => 'required|numeric|min:1',
             'address' => 'required|string|max:255',
@@ -26,7 +26,7 @@ class ProductController extends Controller
             'name' => $validatedData['rice_name'],
             'quality' => $validatedData['quality'],
             'per_sack' => $validatedData['sack_price'],
-            'per_kg' => $validatedData['kg_price'],
+            'quantity' => $validatedData['quantity'],
             'price_bought' => $validatedData['buy_price'],
             'dealer' => $dealerID,
             'address' => $validatedData['address'],

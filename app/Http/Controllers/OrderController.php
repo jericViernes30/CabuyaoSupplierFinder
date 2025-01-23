@@ -9,13 +9,18 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     public function addToCart(Request $request){
+        $order_id = 'ORD-'.$request->input('user_id').'-'.rand(1000, 9999);
+
         $order = [
-            'user_id' => $request->input('user_id'),
+            'order_id' => $order_id,
+            'retailer' => $request->input('user_id'),
             'rice_id' => $request->input('rice_id'),
+            'dealer_id' => $request->input('dealer_id'),
             'order_type' => $request->input('measurement'),
             'count' => $request->input('sacks_count'),
             'status' => 'Pending'
         ];
+        // dd($order);
 
         $addToOrders = Order::create($order);
 
@@ -25,6 +30,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Failed to add order.');
         }
     }
+    
 
     public function addToOrders(Request $request)
     {
@@ -32,25 +38,13 @@ class OrderController extends Controller
         $userID = session('profile')->id;
         $deliveryDate = $request->input('delivery_date');
 
-
-
         // Extract rice_ids from the orders array in the request
-        $riceIds = array_column($request->input('orders'), 'rice_id');
+        $orderID = $request->input('order_id');
 
-        // Query the Order model to find orders matching the rice_ids, status 'Pending', and user_id
-        $pendingOrders = Order::whereIn('rice_id', $riceIds)
-                            ->where('status', 'Pending')
-                            ->where('user_id', $userID)
-                            ->get();
-
-        // Update the status of those orders to 'Reserved'
-        $pendingOrders->each(function ($order) {
-            $order->status = 'On Process'; // Change the status to 'Reserved'
-            $order->save(); // Save the changes to the database
-        });
+        Order::where('order_id', $orderID)->update(['status' => 'Order Placed']);
 
         $deliveryData = [
-            'user_id' => $userID,
+            'order_id' => $orderID,
             'delivery_date' => $deliveryDate
         ];
 
@@ -60,5 +54,20 @@ class OrderController extends Controller
         return redirect(route('retailer.dashboard'))->with('success', 'Order added successfully!');
     }
 
+    // ADMIN
 
+    public function ordersList(){
+        $orders = Order::where('status', 'On Process')
+                        ->get()
+                        ->groupBy('user_id');
+
+        $ordersWithRiceDetails = $orders->map(function ($userOrders) {
+            return $userOrders->map(function ($order) {
+                $order->rice_details = $order->rice; // Assuming you have a relationship set up in the Order model
+                return $order;
+            });
+        });
+
+        return view('dealer.orders', ['orders' => $ordersWithRiceDetails]);
+    }
 }

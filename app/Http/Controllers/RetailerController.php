@@ -83,14 +83,18 @@ class RetailerController extends Controller
     {
         $userID = session('profile')->id;
         $orders = Order::where('status', 'Pending')
-            ->where('user_id', $userID)
+            ->where('retailer', $userID)
             ->get();
+        $ordersID = Order::where('status', 'Pending')
+        ->where('retailer', $userID)
+        ->value('order_id');
         $riceIds = $orders->pluck('rice_id')->unique();
         $riceData = Rice::whereIn('id', $riceIds)->get()->keyBy('id');
         $orderDetails = $orders->map(function ($order) use ($riceData) {
             $rice = $riceData[$order->rice_id];
 
             return [
+                'order_id' => $order->order_id,
                 'rice_name' => $rice->name,
                 'price_per_sack' => $rice->per_sack,
                 'price_per_kg' => $rice->per_kg,
@@ -105,14 +109,16 @@ class RetailerController extends Controller
         });
 
         return view('retailers.cart', [
-            'orderDetails' => $orderDetails
+            'orderDetails' => $orderDetails,
+            'orderID' => $ordersID
         ]);
     }
 
     public function orders()
 {
     $userID = session('profile')->id;
-    $orders = Order::where('user_id', $userID)
+    $orders = Order::where('retailer', $userID)
+        ->where('status', '!=', 'Pending')
         ->get();
     
     // Get unique rice ids from orders
@@ -126,6 +132,7 @@ class RetailerController extends Controller
         $rice = $riceData[$order->rice_id];
         
         return [
+            'placed_at' => $order->updated_at->format('F d, Y - h:i A'),
             'rice_name' => $rice->name,
             'price_per_sack' => $rice->per_sack,
             'price_per_kg' => $rice->per_kg,
@@ -244,6 +251,10 @@ private function calculateDistance($lat1, $lon1, $lat2, $lon2)
 
     // Distance in kilometers
     return $earthRadius * $c;
+}
+
+public function history(){
+    return view('retailers.history');
 }
 
 }

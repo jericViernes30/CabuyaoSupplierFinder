@@ -83,6 +83,23 @@
                         <label for="" class="">Confirm Password</label>
                         <input type="password" name="confirm_password" class="w-full outline-none rounded-md border border-[#cccbcb] p-2">
                     </div>
+                    <input type="hidden" id="lat" name="lat" readonly>
+                    <input type="hidden" id="long" name="long" readonly>
+                    <script>
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                function(position) {
+                                    document.getElementById("lat").value = position.coords.latitude;
+                                    document.getElementById("long").value = position.coords.longitude;
+                                },
+                                function(error) {
+                                    console.error("Error getting location:", error);
+                                }
+                            );
+                        } else {
+                            console.error("Geolocation is not supported by this browser.");
+                        }
+                    </script>
                 </div>
                 <div class="w-full flex gap-5 justify-end">
                     <button id="cancel" class="w-[20%] underline">Cancel</button>

@@ -21,6 +21,8 @@ class Retailer extends Authenticatable
         'address',
         'business_name',
         'business_type',
+        'lat',
+        'long',
         'password'
     ];
 

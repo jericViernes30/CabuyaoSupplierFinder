@@ -17,8 +17,8 @@ return new class extends Migration
             $table->integer('retailer');
             $table->integer('rice_id');
             $table->integer('dealer_id');
-            $table->string('order_type');
             $table->integer('count');
+            $table->integer('to_pay');
             $table->string('status');
             $table->timestamps();
         });

@@ -14,8 +14,8 @@ class Order extends Model
         'retailer',
         'rice_id',
         'dealer_id',
-        'order_type',
         'count',
+        'to_pay',
         'status'
     ];
 

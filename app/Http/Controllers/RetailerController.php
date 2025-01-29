@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dealer;
+use App\Models\History;
 use App\Models\Order;
 use App\Models\Retailer;
 use App\Models\Rice;
@@ -32,6 +33,8 @@ class RetailerController extends Controller
             'address' => $request->input('address'),
             'business_name' => $request->input('business_name'),
             'business_type' => $request->input('business_type'),
+            'lat' => $request->input('lat'),
+            'long' => $request->input('long'),
             'password' => $hashedPassword
         ];
 
@@ -82,9 +85,14 @@ class RetailerController extends Controller
     public function cart()
     {
         $userID = session('profile')->id;
+        
         $orders = Order::where('status', 'Pending')
             ->where('retailer', $userID)
             ->get();
+        $firstOrder = $orders->first();
+        $dealerLat = $firstOrder ? Retailer::where('id', $firstOrder->dealer_id)->value('lat') : null;
+        $dealerLong = $firstOrder ? Retailer::where('id', $firstOrder->dealer_id)->value('long') : null;
+        // dd($dealerLat, $dealerLong);
         $ordersID = Order::where('status', 'Pending')
         ->where('retailer', $userID)
         ->value('order_id');
@@ -100,9 +108,7 @@ class RetailerController extends Controller
                 'price_per_kg' => $rice->per_kg,
                 'count' => $order->count,
                 'order_type' => $order->order_type,
-                'total_price' => $order->order_type == 'per_sack' 
-                                ? $rice->per_sack * $order->count 
-                                : $rice->per_kg * $order->count,
+                'total_price' => $rice->per_sack * $order->count,
                 'image_name' => $rice->image_name,
                 'rice_id' => $rice->id
             ];
@@ -110,48 +116,65 @@ class RetailerController extends Controller
 
         return view('retailers.cart', [
             'orderDetails' => $orderDetails,
-            'orderID' => $ordersID
+            'orderID' => $ordersID,
+            'dealerLat' => $dealerLat,
+            'dealerLong' => $dealerLong,
         ]);
     }
+
+    
 
     public function orders()
 {
     $userID = session('profile')->id;
+
+    // Fetch orders based on retailer ID and status 'Order Placed'
     $orders = Order::where('retailer', $userID)
-        ->where('status', '!=', 'Pending')
+        ->whereIn('status', ['Order Placed', 'Processing Order', 'Out for delivery'])
+        ->latest()
         ->get();
-    
+
+    // Group orders by dealer ID
+    $groupedOrders = $orders->groupBy('dealer_id');
+
+    // Get dealer data
+    $dealerData = Retailer::whereIn('id', $groupedOrders->keys())->get()->keyBy('id');
+
     // Get unique rice ids from orders
     $riceIds = $orders->pluck('rice_id')->unique();
-    
+
     // Fetch rice data by rice ids
     $riceData = Rice::whereIn('id', $riceIds)->get()->keyBy('id');
-    
-    // Process each order with rice details and order status
-    $orderDetails = $orders->map(function ($order) use ($riceData) {
-        $rice = $riceData[$order->rice_id];
-        
+
+    // Prepare the order details per dealer
+    $orderDetails = $groupedOrders->map(function ($group, $dealerId) use ($riceData, $dealerData) {
+        $dealer = $dealerData[$dealerId];
+        $toPay = $group->first()->to_pay;
+        $totalQuantity = $group->sum('count');
+        $totalPrice = $group->sum(function ($order) use ($riceData) {
+            $rice = $riceData[$order->rice_id];
+            return $rice->per_sack * $order->count;
+        });
+
+        // Get the first order's placed_at (all orders have the same date for the dealer)
+        $placedAt = $group->first()->updated_at->format('F d, Y - h:i A');
+
         return [
-            'placed_at' => $order->updated_at->format('F d, Y - h:i A'),
-            'rice_name' => $rice->name,
-            'price_per_sack' => $rice->per_sack,
-            'price_per_kg' => $rice->per_kg,
-            'count' => $order->count,
-            'order_type' => $order->order_type,
-            'total_price' => $order->order_type == 'per_sack' 
-                            ? $rice->per_sack * $order->count 
-                            : $rice->per_kg * $order->count,
-            'image_name' => $rice->image_name,
-            'rice_id' => $rice->id,
-            'status' => $order->status // Add the order status here
+            'dealer_name' => $dealer->business_name,
+            'quantity' => $totalQuantity,
+            'to_pay' => $toPay,
+            'status' => $group->first()->status,
+            'placed_at' => $placedAt
         ];
     });
 
-    // Return the view with order details
+    // Return the view with grouped order details
     return view('retailers.orders', [
         'orderDetails' => $orderDetails
     ]);
 }
+
+
 
 public function filterRiceItems(Request $request)
 {
@@ -253,8 +276,26 @@ private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     return $earthRadius * $c;
 }
 
-public function history(){
-    return view('retailers.history');
-}
+    public function history()
+    {
+        // Fetch all history records for the retailer
+        $histories = History::where('retailer', session('profile')->business_name)->get();
+
+        // Use map to transform the collection
+        $orders = $histories->map(function ($order) {
+            $dealer = Retailer::where('id', $order->dealer_id)->first();
+            return [
+                'dealer' => $dealer ? $dealer->business_name : 'Unknown Dealer', // Handle null dealer
+                'rice_name' => $order->rice_name,
+                'quantity' => $order->quantity,
+                'price' => $order->total_amount,
+                'delivery_date' => $order->created_at->format('F d, Y'),
+            ];
+        });
+
+        return view('retailers.history', ['orders' => $orders]);
+    }
+
+
 
 }

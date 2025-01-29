@@ -67,6 +67,35 @@
                         }
                     });
                 </script>
+                <button id="ship_out" type="button" class="hidden py-2 px-10 bg-[#3b5a54] rounded-lg uppercase text-sm text-white">Ship Out</button>
+                <script>
+                    $('#ship_out').on('click', function() {
+                        const orderId = $('#rice_id').val();
+                        alert(orderId)
+                        if (orderId) {
+                            $.ajax({
+                                url: '{{ route('dealer.order.shipped') }}',
+                                method: 'POST',
+                                data: {
+                                    order_id: orderId,
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    alert('Order marked as processed');
+                                    window.location.href = 'http://127.0.0.1:8000/dealer/orders';
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('Error: ' + error);
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                }
+                            });
+                        } else {
+                            alert('Missing required data');
+                        }
+                    });
+                </script>
                 <button id="order_delivered" type="button" class="hidden py-2 px-10 bg-[#3b5a54] rounded-lg uppercase text-sm text-white">Order's Delivered</button>
             </div>
         </div>
@@ -118,7 +147,7 @@
                 $('#details_div').removeClass('hidden')
                 $('#overlay').removeClass('hidden')
                 var orderID = $(this).data('order');
-                // alert(orderID)
+                alert(orderID)
 
                 $.ajax({
                     url: '{{ route('dealer.order.details') }}',
@@ -136,6 +165,8 @@
 
                         if(response.orders[0].status == 'Order Placed') {
                             $('#process_order').removeClass('hidden');
+                        } else if (response.orders[0].status == 'Processing Order'){
+                            $('#ship_out').removeClass('hidden');
                         } else {
                             $('#order_delivered').removeClass('hidden');
                         }
@@ -164,8 +195,8 @@
                         });
                         $('#total').text(grandTotal.toFixed(2));
                     },
-                    error: function(xhr) {
-                        console.error(xhr.responseText);
+                    error: function(xhr, status, error) {
+                        console.error("Error:", error);
                     }
                 });
             });

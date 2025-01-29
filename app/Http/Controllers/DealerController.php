@@ -142,7 +142,7 @@ class DealerController extends Controller
     $dealerID = session('dealer')->id;
     
     $order = Order::where('dealer_id', $dealerID)
-                  ->whereIn('status', ['Order Placed', 'Processing Order'])
+                  ->whereIn('status', ['Order Placed', 'Processing Order', 'Out for delivery'])
                   ->get();
     // dump($order);
 
@@ -176,46 +176,62 @@ class DealerController extends Controller
 
 public function getOrderDetails(Request $request)
 {
-    // 1. Get the name from the request
+    // 1. Get the orderID and dealerID from the request and session
     $orderID = $request->input('orderID');
     $dealerID = session('dealer')->id;
 
-    // Validate that the name is provided
+    // Log the received orderID and dealerID
+    Log::info('Received Order ID:', ['orderID' => $orderID, 'dealerID' => $dealerID]);
+
+    // Validate that the orderID is provided
     if (!$orderID) {
-        return response()->json(['error' => 'Name is required'], 400);
+        return response()->json(['error' => 'Order ID is required'], 400);
     }
 
+    // 2. Try to find the order based on orderID and dealerID
     $order = Order::where('order_id', $orderID)->where('dealer_id', $dealerID)->first();
 
-    // 2. Find the retailer (client) by the provided name
+    if (!$order) {
+        // Log error if the order is not found
+        Log::error('Order not found for the given orderID and dealerID.', ['orderID' => $orderID, 'dealerID' => $dealerID]);
+        return response()->json(['error' => 'Order not found for the given orderID and dealerID'], 404);
+    }
+
+    // 3. Find the retailer (client) associated with the order
     $client = Retailer::where('id', $order->retailer)->first();
 
     if (!$client) {
-        // Handle case where retailer is not found
+        // Log error if the client is not found
+        Log::error('Retailer not found for order', ['order_id' => $orderID, 'retailer_id' => $order->retailer]);
         return response()->json(['error' => 'Client not found'], 404);
     }
 
-    // 3. Find all orders where user_id matches the retailer's ID
-    $orders = Order::where('retailer', $client->id)->whereIn('status', ['Order Placed', 'Processing Order'])->get();
+    // 4. Try to fetch all orders for this retailer with status 'Order Placed' or 'Processing Order'
+    $orders = Order::where('retailer', $client->id)
+                    ->where('order_id', $orderID)
+                    ->whereIn('status', ['Order Placed', 'Processing Order', 'Out for delivery'])
+                    ->get();
 
-    // Check if there are any orders
     if ($orders->isEmpty()) {
+        // Log if no orders are found
+        Log::info('No orders found for retailer', ['retailer_id' => $client->id]);
         return response()->json(['message' => 'No orders found for this client'], 200);
     }
+    Log::info('Orders before mapping:', ['orders' => $orders]);
 
-    // Get the dealer ID from the session
-    $dealerId = session('dealer')->id;
-
-    // 4. Prepare the data to return, filtering orders for rice from the current dealer
-    $orderData = $orders->map(function ($order) use ($dealerId) {
-        // 5. Get the rice details using the rice_id from the order
+    // 5. Prepare the data to return, filtering orders for rice from the current dealer
+    $orderData = $orders->map(function ($order) use ($dealerID) {
+        // Log each order before filtering
+        Log::info('Mapping order:', ['order' => $order]);
+    
+        // Get the rice details
         $rice = Rice::find($order->rice_id);
+        Log::info('Rice fetched for order:', ['rice' => $rice]);
         $deliverDate = Reserve::where('order_id', $order->order_id)->first();
-
-        // Check if the rice exists and matches the dealer
-        if ($rice && $rice->dealer == $dealerId) {
+        if ($rice && $rice->dealer == session('dealer')->business_name) {
+            Log::info('Order matches dealer:', ['order_id' => $order->order_id]);
             return [
-                'order_id' => $order->order_id, // Include the order ID
+                'order_id' => $order->order_id,
                 'status' => $order->status,
                 'sack_count' => $order->count,
                 'rice_name' => $rice->name,
@@ -225,19 +241,27 @@ public function getOrderDetails(Request $request)
                 'delivery_date' => $deliverDate ? $deliverDate->delivery_date : null,
             ];
         }
-
+    
+        // Log when a match is not found
+        Log::info('Order does not match dealer:', ['order_id' => $order->order_id]);
+    
         // Skip orders that do not match the dealer
         return null;
-    })->filter()->values(); // Remove null entries and re-index the array
+    })->filter()->values();
+    
+
+    // Log the final data being returned
+    Log::info('Returning order details', ['client' => $client->business_name, 'orderData' => $orderData]);
 
     // Return the response as JSON with retailer and filtered orders data
     return response()->json([
         'name' => $client->business_name,
-        'dealer_id' => $dealerId,
+        'dealer_id' => $dealerID,
         'retailer' => $client,
         'orders' => $orderData
     ]);
 }
+
 
 
 
@@ -306,13 +330,40 @@ public function markOrderDelivered(Request $request)
                     ->where('status', 'Order Placed')
                     ->first();
 
+        $rice = Rice::find($order->rice_id);
+
         if ($order) {
             // Update the order status to 'Delivered'
+            $rice->quantity = $rice->quantity - $order->count;
+            $rice->save();
             $order->status = 'Processing Order';
             $order->save();
 
             // Return a success response
             return response()->json(['message' => 'Order marked as processed']);
+        } else {
+            // Return an error response if the order is not found
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+    }
+
+    public function shipOrder(Request $request)
+    {
+        // Get rice_id and user_id from the request
+        $orderID = $request->input('order_id');
+
+        // Find the order based on rice_id and user_id (assuming you have an Order model)
+        $order = Order::where('order_id', $orderID)
+                    ->where('status', 'Processing Order')
+                    ->first();
+
+        if ($order) {
+            // Update the order status to 'Delivered'
+            $order->status = 'Out for delivery';
+            $order->save();
+
+            // Return a success response
+            return response()->json(['message' => 'Order marked as shipped out']);
         } else {
             // Return an error response if the order is not found
             return response()->json(['error' => 'Order not found'], 404);

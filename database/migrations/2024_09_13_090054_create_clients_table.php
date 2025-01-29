@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('address');
             $table->string('business_name');
             $table->string('business_type');
+            $table->string('lat');
+            $table->string('long');
             $table->string('password');
             $table->timestamps();
         });

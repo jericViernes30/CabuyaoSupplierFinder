@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <div id="orders_div" class="hidden w-1/3 h-fit absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl z-20">
+    <div id="orders_div" class="hidden shadow-lg w-1/3 h-fit absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl z-20">
         <div class="w-full bg-[#9ee4d7] px-6 py-2 rounded-tr-xl rounded-tl-xl">
             Order Details
         </div>
@@ -71,41 +71,22 @@
             <div>
                 <p id="rice_name" class="text-xl font-semibold uppercase">Jillian Rice</p>
             </div>
-            <p id="rice_name" class="text-xl font-semibold uppercase">Jillian Rice</p>
-            <p class="">Per sack: &#8369;<span id="price_sack"></span></p>
-            <p class="mb-4">Per kg: &#8369;<span id="price_kg"></span></p>
+            <p class="mb-5">Per sack: &#8369;<span id="price_sack"></span></p>
             <div class="w-full border-b border-black"></div>
             <div class="mt-4">
                 <form action="{{route('retailer.cart.add')}}" method="POST">
                     @csrf
                     <p class="text-sm font-semibold mb-4">Order Quantity:</p>
-                    <div class="w-full flex items-center mb-4">
-                        <p class="w-1/3">Select order type:</p>
-                        <div class="w-2/3 flex items-center gap-4">
-                            <div>
-                                <label for="per_sack">
-                                    <input type="radio" id="per_sack" name="measurement" value="per_sack" class="text-sm">
-                                    Per Sack
-                                </label>
-                            </div>
-                            <div>
-                                <label for="per_kg">
-                                    <input type="radio" id="per_kg" name="measurement" value="per_kg" class="text-sm">
-                                    Per KG
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="count" class="hidden w-full gap-2 mb-6">
+                    <div id="count" class="w-full gap-2 mb-6">
                         <p>How many sacks:</p>
-                        <input type="text" name="sacks_count" value="0" class="w-16 border-b border-black outline-none text-center text-sm">
+                        <input type="text" name="sacks_count" value="1" class="w-16 border-b border-black outline-none text-center text-sm">
                     </div>
-                    <div id="btn_div" class="hidden w-full justify-end">
-                            <input id="rice_id" type="hidden" name="rice_id">
-                            <input id="dealer_id" type="hidden" name="dealer_id">
-                            <input type="hidden" name="user_id" value="{{ session('profile')->id }}">
-                            <button type="submit" class="py-2 px-10 rounded-md bg-[#9ee4d7]">Add to Orders</button>
+                    <div class="hidden w-full justify-end">
+                        <input id="rice_id" type="hidden" name="rice_id">
+                        <input id="dealer_id" type="hidden" name="dealer_id">
+                        <input type="hidden" name="user_id" value="{{ session('profile')->id }}">
                     </div>
+                    <button type="submit" class="py-2 px-10 rounded-md bg-[#9ee4d7]">Add to Orders</button>
                 </form>
             </div>
         </div>

@@ -169,13 +169,17 @@
                             <p class="w-[10%]">Total (&#8369;)</p>
                             <p class="w-[25%] text-center">Delivered Date</p>
                         </div>
-                        <div class="w-full flex items-center px-2 py-3 border-b border-[#3b5a54] text-black">
-                            <p class="w-[25%]"></p>
-                            <p class="w-[25%]"></p>
-                            <p class="w-[15%]"></p>
-                            <p class="w-[10%]"></p>
-                            <p class="w-[25%] text-center"></p>
-                        </div>
+                        @foreach ($orders as $order)
+                            <div class="w-full flex items-center px-2 py-3 border-b border-[#3b5a54] text-black">
+                                <p class="w-[25%]">{{ $order['dealer'] }}</p>
+                                <p class="w-[25%]">{{ $order['rice_name'] }}</p>
+                                <p class="w-[15%]">{{ $order['quantity'] }}</p>
+                                <p class="w-[10%]">{{ $order['price'] }}</p>
+                                <p class="w-[25%] text-center">{{ $order['delivery_date'] }}</p>
+                            </div>
+                        @endforeach
+
+
                     </div>
                 </div>
             </div>

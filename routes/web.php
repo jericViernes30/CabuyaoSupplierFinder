@@ -28,6 +28,7 @@ Route::get('/dealer/orders', [DealerController::class, 'orders'])->name('dealer.
 Route::post('/dealer/order-details', [DealerController::class, 'getOrderDetails'])->name('dealer.order.details');
 Route::post('/dealer/mark-order-delivered', [DealerController::class, 'markOrderDelivered'])->name('dealer.order.delivered');
 Route::post('/dealer/mark-order-processed', [DealerController::class, 'processOrder'])->name('dealer.order.processed');
+Route::post('/dealer/mark-order-shipped', [DealerController::class, 'shipOrder'])->name('dealer.order.shipped');
 Route::post('/dealer/add-product', [ProductController::class, 'addProduct'])->name('dealer.product.add');
 Route::get('/dealer/rice/delete/{id}', [DealerController::class, 'deleteRiceItem']);
 Route::get('/dealer/history', [DealerController::class, 'history'])->name('dealer.history');

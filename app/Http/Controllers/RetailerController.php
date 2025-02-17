@@ -41,7 +41,7 @@ class RetailerController extends Controller
         $signin = Retailer::create($data);
 
         if($signin){
-            return redirect()->route('retailer.dashboard')->with('success', 'Account registered successfully!');
+            return redirect()->route('login')->with('success', 'Account registered successfully!');
         }
     }
 

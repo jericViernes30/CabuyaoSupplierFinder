@@ -81,6 +81,19 @@ class DealerController extends Controller
         return view('dealers.add_items');
     }
 
+    public function logout()
+    {
+        // Log the user out
+        Auth::logout();
+
+        // Optionally, you can invalidate the session (for extra security)
+        session()->invalidate();
+        session()->regenerateToken();
+
+        // Redirect to the login page or home page after logout
+        return redirect()->route('index');
+    }
+
     public function signUpDealer(){
         // dd($request);
 
@@ -274,7 +287,7 @@ public function markOrderDelivered(Request $request)
 
     // Find the order based on the order ID and check if its status is 'Processing Order'
     $order = Order::where('order_id', $orderID)
-                  ->where('status', 'Processing Order')
+                  ->where('status', 'Out for delivery')
                   ->first();
 
     if ($order) {

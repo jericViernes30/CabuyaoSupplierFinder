@@ -51,18 +51,18 @@
                     </div>
                 </div>
                 <div class="w-full flex gap-5 justify-end">
-                    <button type="submit" class="w-[30%] bg-[#9ee4d7] rounded-md py-2 border text-[#252525] disabled hover:disable">Login</button>
+                    <button type="submit" class="w-full bg-[#9ee4d7] rounded-md py-2 border text-[#252525] disabled hover:disable">Login</button>
                 </div>
             </form>
             <p class="text-sm text-center mt-6">Don't have an account? <a href="{{route('signup')}}" class="text-sm underline">Sign Up</a></p>
-            <a href="{{route('dealer.login')}}" class="text-sm text-center mt-2 text-[#3b5a54]">Login as Dealer</a>
+            <a href="{{route('dealer.login')}}" class="text-sm text-center mt-2 text-[#3b5a54] block mx-auto">Login as Dealer</a>
         </div>
-        <h3>Click on the map to select a location</h3>
+        {{-- <h3>Click on the map to select a location</h3>
         <div id="map"></div>
-        <div id="coordinates">Latitude: <span id="lat"></span>, Longitude: <span id="lng"></span></div>
+        <div id="coordinates">Latitude: <span id="lat"></span>, Longitude: <span id="lng"></span></div> --}}
 
-        <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+        {{-- <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script> --}}
     </div>
     <script>
         $(document).ready(function(){

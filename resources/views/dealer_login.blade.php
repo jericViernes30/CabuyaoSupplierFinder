@@ -45,10 +45,10 @@
                     </div>
                 </div>
                 <div class="w-full flex gap-5 justify-end">
-                    <button class="w-[30%] bg-[#9ee4d7] rounded-md py-2 border text-[#252525] disabled hover:disable">Login</button>
+                    <button class="w-full bg-[#9ee4d7] rounded-md py-2 border text-[#252525] disabled hover:disable">Login</button>
                 </div>
             </form>
-            <p class="text-sm text-center mt-2 text-[#3b5a54]">Login as Retailer</p>
+            <a href="{{route('login')}}" class="text-sm text-center mt-2 text-[#3b5a54] block mx-auto">Login as Retailer</a>
         </div>
     </div>
     <script>

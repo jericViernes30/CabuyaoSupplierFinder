@@ -11,11 +11,12 @@ class History extends Model
 
     protected $fillable = [
         'order_id',
-        'dealer_id',
+        'dealer_id', // I just named it dealer_id but the actual value is the business_name
         'retailer',
         'rice_name',
         'quantity',
         'total_amount',
-        'order_type'
+        'order_type',
+        'rated'
     ];
 }

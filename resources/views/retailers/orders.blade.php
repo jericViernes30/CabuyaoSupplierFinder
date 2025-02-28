@@ -55,17 +55,23 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#eed202" width="20" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
                     <p class="text-orange-500 font-medium text-xs">Application under development, expect few bugs and unfinished features</p>
                 </div>
-                <div class="w-1/2 flex justify-end">
-                    <div class="w-[15%] text-center">
+                <div class="w-1/2 flex justify-end relative">
+                    <div class="w-[25%] text-center">
                         @if(session('profile'))
-                            <button>Hi, {{ session('profile')->first_name }}</button>
+                            <button id="acc-btn">Hi, {{ session('profile')->first_name }}</button>
                         @else
                             <button>Hi, Guest</button>
                         @endif
                     </div>
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20" fill="#252525"><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
-                    </button>
+                    <div id="drpdown" class="absolute bg-[#ececec] text-sm w-[25%] -bottom-16 text-center rounded-md shadow-xl hidden flex-col gap-2">
+                        <a href="{{route('retailer.profile')}}" class="py-1 hover:cursor-pointer hover:bg-main px-4">Profile</a>
+                        <form action="{{ route('retailer.logout') }}" method="POST" class="py-1 hover:cursor-pointer hover:bg-main px-4">
+                            @csrf  <!-- CSRF token for security -->
+                            <button type="submit">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="w-full p-7 h-[90%]">
@@ -120,7 +126,10 @@
     </div>
     <script>
         $(document).ready(function () {
-            
+            $('#acc-btn').on('click', function() {
+                $('#drpdown').toggleClass('hidden')
+                $('#drpdown').toggleClass('flex')
+            })
         });
     </script>
 </body>

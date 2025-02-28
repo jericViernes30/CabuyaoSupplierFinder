@@ -18,24 +18,27 @@ class DealerController extends Controller
 {
     public function dashboard(){
         $dealerID = session('dealer')->id;
-
+        $dealer_name = session('dealer')->business_name;
+    
         $pendingOrders = Order::whereIn('status', ['Order Placed', 'Processing Order'])
-        ->where('dealer_id', $dealerID)
-        ->count();
-
+            ->where('dealer_id', $dealerID)
+            ->count();
+    
+        $grainsOnSale = Rice::where('dealer', $dealer_name)->where('quantity', '>', 0)->count();
+    
         // Calculate sales for this month
-        $thisMonthProfit = History::where('dealer_id', $dealerID)
+        $thisMonthProfit = History::where('dealer_id', $dealer_name)
             ->whereMonth('created_at', now()->month)
             ->sum('total_amount');
-        $thisMonthSacks = History::where('dealer_id', $dealerID)
+        $thisMonthSacks = History::where('dealer_id', $dealer_name)
             ->whereMonth('created_at', now()->month)
             ->sum('quantity');
     
         // Calculate sales for the previous month
-        $previousMonthProfit = History::where('dealer_id', $dealerID)
+        $previousMonthProfit = History::where('dealer_id', $dealer_name)
             ->whereMonth('created_at', now()->subMonth()->month)
             ->sum('total_amount');
-        $previousMonthSacks = History::where('dealer_id', $dealerID)
+        $previousMonthSacks = History::where('dealer_id', $dealer_name)
             ->whereMonth('created_at', now()->subMonth()->month)
             ->sum('quantity');
     
@@ -43,10 +46,8 @@ class DealerController extends Controller
         $profitChange = $previousMonthProfit ? (($thisMonthProfit - $previousMonthProfit) / $previousMonthProfit) * 100 : 100;
         $sacksChange = $previousMonthSacks ? (($thisMonthSacks - $previousMonthSacks) / $previousMonthSacks) * 100 : 100;
     
-       
-
         // Get monthly sales data for the current year
-        $monthlySales = History::where('dealer_id', $dealerID)
+        $monthlySales = History::where('dealer_id', $dealer_name)
             ->whereYear('created_at', now()->year)
             ->selectRaw('MONTH(created_at) as month, SUM(total_amount) as total_amount')
             ->groupBy('month')
@@ -55,15 +56,36 @@ class DealerController extends Controller
             ->mapWithKeys(function ($item) {
                 return [date('F', mktime(0, 0, 0, $item->month, 10)) => $item->total_amount];
             });
+    
+        // Get sales per rice type
+        $soldPerRice = History::where('dealer_id', $dealer_name)
+            ->selectRaw('rice_name, SUM(quantity) as total_quantity')
+            ->groupBy('rice_name')
+            ->orderByDesc('total_quantity')
+            ->get();
+
+        Log::info($soldPerRice); // ✅ Check if this contains data
+    
+        $riceNames = $soldPerRice->pluck('rice_name');
+        $riceQuantities = $soldPerRice->pluck('total_quantity');
+    
         $stats = [
             'profit' => htmlspecialchars((string) $thisMonthProfit),
             'sacks' => htmlspecialchars((string) $thisMonthSacks),
             'pendingOrders' => $pendingOrders,
             'profitChange' => $profitChange,
             'sacksChange' => $sacksChange,
+            'grainsOnSale' => $grainsOnSale
         ];
-        return view('dealers.dashboard', ['status' => $stats, 'monthlySales' => $monthlySales]);
+    
+        return view('dealers.dashboard', [
+            'status' => $stats,
+            'monthlySales' => $monthlySales,
+            'riceNames' => $riceNames,
+            'riceQuantities' => $riceQuantities
+        ]);
     }
+    
     
     
     
@@ -106,14 +128,14 @@ class DealerController extends Controller
             'email_address' => 'allanlabigan@gmail.com',
             'contact_number' => '09917582491',
             'address' => 'San Isidro Cabuyao Laguna',
-            'latitude' => '14.254524900598247',
-            'longitude' => '121.12842534347477',
+            'lat' => '14.254524900598247',
+            'long' => '121.12842534347477',
             'business_name' => 'Allan Rice Trading',
             'business_type' => 'Dealer',
             'password' => $hashedPassword
         ];
 
-        $signin = Dealer::create($data);
+        $signin = Retailer::create($data);
 
         if($signin){
             return redirect()->route('login')->with('success', 'Account registered successfully!');
@@ -275,11 +297,6 @@ public function getOrderDetails(Request $request)
     ]);
 }
 
-
-
-
-
-
 public function markOrderDelivered(Request $request)
 {
     // Get the order ID from the request
@@ -296,7 +313,7 @@ public function markOrderDelivered(Request $request)
         $order->save();
 
         // Get dealer ID from the session
-        $dealerID = session('dealer')->id;
+        $dealerID = session('dealer')->business_name;
 
         // Retrieve associated retailer, rice, and calculate total price
         $retailer = Retailer::where('id', $order->retailer)->first();
@@ -313,6 +330,7 @@ public function markOrderDelivered(Request $request)
             'quantity' => $order->count,
             'total_amount' => $totalPrice,
             'order_type' => $orderType,
+            'rated' => 'false'
         ];
 
         // Log the delivered array
@@ -402,6 +420,12 @@ public function markOrderDelivered(Request $request)
         } else {
             return response()->json(['error' => 'Rice item not found'], 404);
         }
+    }
+
+    public function profile(){
+        $retailer = session('dealer')->id;
+        $retailerDetails = Retailer::where('id', $retailer)->first();
+        return view('dealers.profile', ['dealer' => $retailerDetails]);
     }
 
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('quality');
             $table->string('dealer');
             $table->string('image_name');
+            $table->integer('rate')->nullable();
             $table->timestamps();
         });
     }

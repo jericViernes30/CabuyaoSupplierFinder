@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\History;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Rice;
@@ -46,13 +47,30 @@ class ProductController extends Controller
         $search = $request->input('search');
 
         // Filter results based on name, quality, or dealer
-        $results = Rice::where('name', 'like', "%{$search}%")
+        $riceList = Rice::where('name', 'like', "%{$search}%")
                         ->orWhere('quality', 'like', "%{$search}%")
                         ->orWhere('dealer', 'like', "%{$search}%")
                         ->get();
 
-        // Return the results as JSON
-        return response()->json($results);
+        // Append history count and final rate to each rice entry
+        $riceData = $riceList->map(function ($r) {
+            $historyCount = History::where('rice_name', $r->name)
+                                ->where('dealer_id', $r->dealer)
+                                ->count();
+
+            // Avoid division by zero
+            $finalRate = $historyCount > 0 ? $r->rate / $historyCount : 0;
+
+            // Add calculated data
+            $r->history_count = $historyCount;
+            $r->final_rate = $finalRate;
+
+            return $r;
+        });
+
+        // Return the modified results as JSON
+        return response()->json($riceData);
     }
+
 
 }

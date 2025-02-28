@@ -39,7 +39,7 @@
                 <div class="w-full mb-4">
                     <div class="flex justify-evenly items-center gap-4">
                         <div class="w-1/4 flex flex-col items-center py-10 justify-center shadow-md rounded-lg bg-[#c6e1e9]">
-                            <p class="text-5xl font-semibold">10</p>
+                            <p class="text-5xl font-semibold">{{$status['grainsOnSale']}}</p>
                             <p>Grains on sale</p>
                         </div>
                         <div class="w-1/4 flex flex-col items-center py-10 justify-center shadow-md rounded-lg bg-[#c6e1e9]">
@@ -81,34 +81,34 @@
 
         const ctx = document.getElementById('salesChart').getContext('2d');
 
-// Your monthly sales data
-const monthlySales = <?php echo json_encode($monthlySales); ?>;
+        // Your monthly sales data
+        const monthlySales = <?php echo json_encode($monthlySales); ?>;
 
-const salesData = Object.values(monthlySales); // Get the values from the associative array
-const months = Object.keys(monthlySales); // Get the keys (months) from the associative array
-console.log(months);
-// Create the chart
-const salesChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: months, // ['January', 'February', ..., 'December']
-        datasets: [{
-            label: 'Sales Total',
-            data: salesData, // Corresponding sales data
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
-                max: 10000
+        const salesData = Object.values(monthlySales); // Get the values from the associative array
+        const months = Object.keys(monthlySales); // Get the keys (months) from the associative array
+        console.log(months);
+        // Create the chart
+        const salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months, // ['January', 'February', ..., 'December']
+                datasets: [{
+                    label: 'Sales Total',
+                    data: salesData, // Corresponding sales data
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10000
+                    }
+                }
             }
-        }
-    }
-});
+        });
 
 
 
@@ -118,13 +118,14 @@ const salesChart = new Chart(ctx, {
         };
 
         const ctx1 = document.getElementById('riceSalesChart').getContext('2d');
+
         const riceSalesChart = new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: ['Jasmine', 'Basmati', 'Arborio', 'Carnaroli', 'Sona Masoori', 'Brown Rice', 'Glutinous Rice', 'Red Rice', 'Wild Rice', 'Black Rice'],
+                labels: {!! json_encode($riceNames) !!}, // Rice names
                 datasets: [{
                     label: 'Total Sacks Sold',
-                    data: generateRandomSacks(),
+                    data: {!! json_encode($riceQuantities) !!}, // Quantity sold per rice type
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',

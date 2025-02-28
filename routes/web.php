@@ -32,7 +32,7 @@ Route::post('/dealer/mark-order-shipped', [DealerController::class, 'shipOrder']
 Route::post('/dealer/add-product', [ProductController::class, 'addProduct'])->name('dealer.product.add');
 Route::get('/dealer/rice/delete/{id}', [DealerController::class, 'deleteRiceItem']);
 Route::get('/dealer/history', [DealerController::class, 'history'])->name('dealer.history');
-
+Route::get('dealer/profile', [DealerController::class, 'profile'])->name('dealer.profile');
 
 
 
@@ -50,3 +50,6 @@ Route::get('/retailer/orders', [RetailerController::class, 'orders'])->name('ret
 Route::get('/retailer/rice/live-search', [ProductController::class, 'liveSearch'])->name('rice.livesearch');
 Route::POST('/retailer/distance', [RetailerController::class, 'filterRiceItems'])->name('retailer.distance');
 Route::get('/retailer/history', [RetailerController::class, 'history'])->name('retailer.history');
+Route::POST('retailer/rate', [RetailerController::class, 'rate'])->name('retailer.rate');
+Route::get('retailer/profile', [RetailerController::class, 'profile'])->name('retailer.profile');
+Route::post('retailer/update-password', [RetailerController::class, 'changePassword'])->name('retailer.password.update');

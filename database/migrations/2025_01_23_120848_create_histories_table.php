@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->integer('total_amount');
             $table->string('order_type');
+            $table->string('rated');
             $table->timestamps();
         });
     }

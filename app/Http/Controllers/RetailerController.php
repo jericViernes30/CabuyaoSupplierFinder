@@ -14,10 +14,29 @@ use Illuminate\Support\Facades\Log;
 
 class RetailerController extends Controller
 {
-    public function dashboard(){
-        $rice = Rice::all();
-        return view('retailers.dashboard', ['rice' => $rice]);
-    }
+    public function dashboard()
+{
+    $riceList = Rice::all();
+
+    // Append history count and final rate to each rice entry
+    $riceData = $riceList->map(function ($r) {
+        $historyCount = History::where('rice_name', $r->name)
+                               ->where('dealer_id', $r->dealer)
+                               ->count();
+
+        // Avoid division by zero
+        $finalRate = $r->rate > 0 ? $r->rate / $historyCount : 0;
+
+        // Add calculated data
+        $r->history_count = $historyCount;
+        $r->final_rate = $finalRate;
+
+        return $r;
+    });
+
+    return view('retailers.dashboard', ['rice' => $riceData]);
+}
+
 
     public function signUpUser(Request $request){
         // dd($request);
@@ -52,7 +71,7 @@ class RetailerController extends Controller
             'password' => 'required|string',
         ]);
 
-        $retailer = Retailer::where('email_address', $request->email_address)->first();
+        $retailer = Retailer::where('email_address', $request->email_address)->where('business_type', 'retailer')->first();
         $rice = Rice::all();
 
 
@@ -182,64 +201,79 @@ public function filterRiceItems(Request $request)
     $lat = $request->input('lat');
     $long = $request->input('long');
     $location_distance = $request->input('location_distance');
-    $price_from = $request->input('price_from');
-    $price_to = $request->input('price_to');
+    $price_from = $request->input('price_from') ?? 0;
+    $price_to = $request->input('price_to') ?? 9999;
 
     // Log received coordinates and filters
     Log::info("Received coordinates: Lat = $lat, Long = $long");
     Log::info("Price range: From = $price_from, To = $price_to");
 
-    // Fetch rice items with their dealer IDs
-    $riceItems = Rice::with('dealer')->get();
+    // Fetch rice items
+    $riceItems = Rice::all();
+    Log::info('Rice items:', $riceItems->toArray()); // Use toArray() for logging
 
-    $filteredRiceItems = [];
+    $filteredRiceItems = $riceItems->filter(function ($rice) use ($lat, $long, $location_distance, $price_from, $price_to) {
+        $dealer_name = $rice->dealer;
 
-    foreach ($riceItems as $rice) {
-        // Get dealer ID
-        $dealerId = $rice->dealer;
-
-        if (!$dealerId) {
-            Log::info("Rice item " . $rice->name . " has no dealer.");
-            continue;
+        if (!$dealer_name) {
+            Log::info("Skipping rice item '{$rice->name}' - No dealer found.");
+            return false;
         }
 
-        // Fetch the full dealer data using the dealer ID
-        $dealer = Dealer::find($dealerId);
+        // Fetch dealer data based on business name
+        $dealer = Retailer::where('business_name', $dealer_name)
+                          ->where('business_type', 'dealer')
+                          ->first();
 
-        // Skip rice items without dealer data or missing coordinates
-        if (!$dealer || !$dealer->latitude || !$dealer->longitude) {
-            Log::info("Skipping rice item " . $rice->name . " due to missing dealer coordinates.");
-            continue;
+        if (!$dealer || !$dealer->lat || !$dealer->long) {
+            Log::info("Skipping rice item '{$rice->name}' - Missing dealer coordinates.");
+            return false;
         }
 
-        // If latitude and longitude are not provided, skip distance filtering
+        // Calculate distance if lat/long are provided
         if ($lat && $long) {
-            // Calculate the distance to the dealer's location
-            $distance = $this->calculateDistance($lat, $long, $dealer->latitude, $dealer->longitude);
-            Log::info("Calculated distance: " . $distance . " km for rice item ID: " . $rice->id);
+            $distance = $this->calculateDistance($lat, $long, $dealer->lat, $dealer->long);
+            Log::info("Distance to dealer '{$dealer_name}' for '{$rice->name}': $distance km");
 
-            // Check distance filter
             if ($location_distance && $distance > $location_distance) {
-                Log::info("Rice item " . $rice->name . " is too far.");
-                continue;
+                Log::info("Skipping rice item '{$rice->name}' - Too far.");
+                return false;
             }
         }
 
-        // Check price filter using 'per_sack' column
+        // Check price range
         if ($rice->per_sack < $price_from || $rice->per_sack > $price_to) {
-            Log::info("Rice item " . $rice->name . " fails the price filter");
-            continue;
+            Log::info("Skipping rice item '{$rice->name}' - Outside price range.");
+            return false;
         }
 
-        // If passed all filters, add to the filtered list
-        $filteredRiceItems[] = $rice;
-    }
+        return true;
+    });
+
+    // Append history count and final rate to each rice entry
+    $riceData = $filteredRiceItems->map(function ($r) {
+        $historyCount = History::where('rice_name', $r->name)
+                               ->where('dealer_id', $r->dealer)
+                               ->count();
+
+        // Avoid division by zero
+        $finalRate = ($historyCount > 0) ? ($r->rate / $historyCount) : 0;
+
+        // Add calculated data
+        $r->history_count = $historyCount;
+        $r->final_rate = $finalRate;
+
+        return $r;
+    });
 
     // Log filtered rice items count
-    Log::info("Filtered rice items: " . count($filteredRiceItems));
+    Log::info("Filtered rice items count: " . $riceData->count());
+    Log::info("Filtered rice items:", $riceData->toArray());
 
-    return response()->json(['riceItems' => $filteredRiceItems]);
+    return response()->json(['riceItems' => $riceData]);
 }
+
+
 
 
 
@@ -283,18 +317,70 @@ private function calculateDistance($lat1, $lon1, $lat2, $lon2)
 
         // Use map to transform the collection
         $orders = $histories->map(function ($order) {
-            $dealer = Retailer::where('id', $order->dealer_id)->first();
+            $dealer = Retailer::where('business_name', $order->dealer_id)->first();
             return [
                 'dealer' => $dealer ? $dealer->business_name : 'Unknown Dealer', // Handle null dealer
                 'rice_name' => $order->rice_name,
                 'quantity' => $order->quantity,
                 'price' => $order->total_amount,
                 'delivery_date' => $order->created_at->format('F d, Y'),
+                'rated' => $order->rated,
+                'orderID' => $order->order_id
             ];
         });
 
         return view('retailers.history', ['orders' => $orders]);
     }
+
+    public function rate(Request $request)
+{
+    $riceName = $request->input('rice');
+    $dealer = $request->input('dealer');
+    $rate = $request->input('rate');
+    $orderID = $request->input('orderID');
+
+    // Find the rice entry
+    $rice = Rice::where('name', $riceName)->where('dealer', $dealer)->first();
+    $rice_inHistory = History::where('order_id', $orderID)->first();
+
+    $rice_inHistory->rated = 'true';
+    $rice_inHistory->save();
+
+    if (!$rice) {
+        return response()->json(['error' => 'Rice not found'], 404);
+    }
+
+    // Update the rate
+    $rice->rate += $rate;
+    $rice->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Rated successfully!',
+    ]);
+}
+
+public function profile(){
+    $retailer = session('profile')->id;
+    $retailerDetails = Retailer::where('id', $retailer)->first();
+    return view('retailers.profile', ['retailer' => $retailerDetails]);
+}
+
+public function changePassword(Request $request){
+    $old_password = $request->input('old_password');
+    $new_password = $request->input('new_password');
+
+    $retailer = session('profile')->id;
+    $retailerDetails = Retailer::where('id', $retailer)->first();
+    if(Hash::check($old_password, $retailerDetails->password)){
+        $retailerDetails->password = Hash::make($new_password);
+        $retailerDetails->save();
+        return redirect()->route('retailer.profile')->with('success', 'Password changed successfully!');
+    }else{
+        return redirect()->route('retailer.dashboard')->with('error', 'Old password is incorrect!');
+    }
+}
+
 
 
 

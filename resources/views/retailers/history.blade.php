@@ -16,7 +16,6 @@
 </head>
 <body class="w-full h-screen relative overflow-hidden">
     <div id="cover" class="hidden w-full h-screen absolute top-0 bg-[#000000a6] z-10"></div>
-
     <div id="filter_div" class="hidden w-1/3 h-fit absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl z-20">
         <div class="w-full flex items-center justify-between bg-[#9ee4d7] px-6 py-2 rounded-tr-xl rounded-tl-xl">
             <p>Filter Items</p>
@@ -151,17 +150,23 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#eed202" width="20" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
                     <p class="text-orange-500 font-medium text-xs">Application under development, expect few bugs and unfinished features</p>
                 </div>
-                <div class="w-1/2 flex justify-end">
-                    <div class="w-[15%] text-center">
+                <div class="w-1/2 flex justify-end relative">
+                    <div class="w-[25%] text-center">
                         @if(session('profile'))
-                            <button>Hi, {{ session('profile')->first_name }}</button>
+                            <button id="acc-btn">Hi, {{ session('profile')->first_name }}</button>
                         @else
                             <button>Hi, Guest</button>
                         @endif
                     </div>
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20" fill="#252525"><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
-                    </button>
+                    <div id="drpdown" class="absolute bg-[#ececec] text-sm w-[25%] -bottom-16 text-center rounded-md shadow-xl hidden flex-col gap-2">
+                        <a href="{{route('retailer.profile')}}" class="py-1 hover:cursor-pointer hover:bg-main px-4">Profile</a>
+                        <form action="{{ route('retailer.logout') }}" method="POST" class="py-1 hover:cursor-pointer hover:bg-main px-4">
+                            @csrf  <!-- CSRF token for security -->
+                            <button type="submit">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="w-full p-7 h-[90%]">
@@ -174,25 +179,112 @@
                         <div class="w-full flex items-center px-2 py-2 mb-2 bg-[#3b5a54] text-white">
                             <p class="w-[25%]">Dealer</p>
                             <p class="w-[25%]">Rice</p>
-                            <p class="w-[15%]">Order count</p>
-                            <p class="w-[10%]">Total (&#8369;)</p>
-                            <p class="w-[25%] text-center">Delivered Date</p>
+                            <p class="w-[10%]">Order count</p>
+                            <p class="w-[18%]">Total (&#8369;)</p>
+                            <p class="w-[25%]">Delivered Date</p>
+                            <div class="w-[7%]"></div>
                         </div>
                         @foreach ($orders as $order)
                             <div class="w-full flex items-center px-2 py-3 border-b border-[#3b5a54] text-black">
                                 <p class="w-[25%]">{{ $order['dealer'] }}</p>
                                 <p class="w-[25%]">{{ $order['rice_name'] }}</p>
-                                <p class="w-[15%]">{{ $order['quantity'] }}</p>
-                                <p class="w-[10%]">{{ $order['price'] }}</p>
-                                <p class="w-[25%] text-center">{{ $order['delivery_date'] }}</p>
+                                <p class="w-[10%]">{{ $order['quantity'] }}</p>
+                                <p class="w-[18%]">{{ $order['price'] }}</p>
+                                <p class="w-[25%]">{{ $order['delivery_date'] }}</p>
+                                <div class="w-[7%]">
+                                    <button id="rate-btn" 
+                                        data-rice="{{ $order['rice_name'] }}" 
+                                        data-dealer="{{ $order['dealer'] }}" 
+                                        data-orderID="{{ $order['orderID'] }}" 
+                                        class="py-2 px-6 text-xs rounded-full bg-yellow-500 
+                                            @if($order['rated'] == 'true') cursor-not-allowed bg-green-300 @endif"
+                                            @if($order['rated'] == 'true') disabled @endif
+                                        >
+                                        @if($order['rated'] == 'true') 
+                                            Rated
+                                        @else 
+                                            Rate
+                                        @endif
+                                    </button>
+
+                                </div>
                             </div>
                         @endforeach
-
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div id="rate" class="hidden w-1/5 h-auto p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded lg bg-white z-20">
+        <p class="mb-3">Rate:</p>
+        <div class="w-full flex items-center justify-evenly gap-2">
+            <button data-val="1" class="rate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="45" height="45" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>
+            </button>
+            <button data-val="2" class="rate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="45" height="45" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>
+            </button>
+            <button data-val="3" class="rate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="45" height="45" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>
+            </button>
+            <button data-val="4" class="rate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="45" height="45" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>
+            </button>
+            <button data-val="5" class="rate-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="45" height="45" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/></svg>
+            </button>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $('#acc-btn').on('click', function() {
+                $('#drpdown').toggleClass('hidden')
+                $('#drpdown').toggleClass('flex')
+            })
+            let riceName = '';
+            let dealer = '';
+            let orderID = '';
+
+            // Handle rate button click
+            $(document).on('click', '#rate-btn', function () {
+                $('#rate').removeClass('hidden');
+                $('#cover').removeClass('hidden');
+                
+                riceName = $(this).data('rice');
+                dealer = $(this).data('dealer');
+                orderID = $(this).data('orderid');
+            });
+
+            // Handle rating submission
+            $(document).on('click', '.rate-btn', function(){
+                let rate = $(this).data('val');
+
+                $.ajax({
+                    url: "{{ route('retailer.rate') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        rate: rate,
+                        orderID: orderID,
+                        rice: riceName,
+                        dealer: dealer
+                    },
+                    success: function(response){
+                        if (response.success) {
+                            alert(response.message);
+                            $('#rate').addClass('hidden');
+                            $('#cover').addClass('hidden');
+                        }
+                    },
+                    error: function(xhr, error){
+                        console.error(error);
+                        alert("Error submitting rating.");
+                    }
+                });
+
+            });
+        });
+
+    </script>
 </body>
 </html>

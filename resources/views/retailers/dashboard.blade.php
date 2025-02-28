@@ -16,7 +16,6 @@
 </head>
 <body class="w-full h-screen relative overflow-hidden">
     <div id="cover" class="hidden w-full h-screen absolute top-0 bg-[#000000a6] z-10"></div>
-
     <div id="filter_div" class="hidden w-1/3 h-fit absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl z-20">
         <div class="w-full flex items-center justify-between bg-[#9ee4d7] px-6 py-2 rounded-tr-xl rounded-tl-xl">
             <p>Filter Items</p>
@@ -114,13 +113,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17"><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9L0 168c0 13.3 10.7 24 24 24l110.1 0c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24l0 104c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65 0-94.1c0-13.3-10.7-24-24-24z"/></svg>
                     <p class="font-light">History</p>
                 </button>
-                <form action="{{ route('retailer.logout') }}" method="POST" class="pl-10">
-                    @csrf  <!-- CSRF token for security -->
-                    <button type="submit" class="py-2 w-full text-left flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="17" height="17"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
-                        <p>Logout</p>
-                    </button>
-                </form>
+                
             </div>
             {{-- <div>
                 <p class="text-sm font-light">jericviernes06@gmail.com</p>
@@ -132,17 +125,23 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#eed202" width="20" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
                     <p class="text-orange-500 font-medium text-xs">Application under development, expect few bugs and unfinished features</p>
                 </div>
-                <div class="w-1/2 flex justify-end">
-                    <div class="w-[15%] text-center">
+                <div class="w-1/2 flex justify-end relative">
+                    <div class="w-[25%] text-center">
                         @if(session('profile'))
-                            <button>Hi, {{ session('profile')->first_name }}</button>
+                            <button id="acc-btn">Hi, {{ session('profile')->first_name }}</button>
                         @else
                             <button>Hi, Guest</button>
                         @endif
                     </div>
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20" fill="#252525"><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
-                    </button>
+                    <div id="drpdown" class="absolute bg-[#ececec] text-sm w-[25%] -bottom-16 text-center rounded-md shadow-xl hidden flex-col gap-2">
+                        <a href="{{route('retailer.profile')}}" class="py-1 hover:cursor-pointer hover:bg-main px-4">Profile</a>
+                        <form action="{{ route('retailer.logout') }}" method="POST" class="py-1 hover:cursor-pointer hover:bg-main px-4">
+                            @csrf  <!-- CSRF token for security -->
+                            <button type="submit">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="w-full p-7 h-[90%]">
@@ -159,8 +158,8 @@
                         <button id="filter" type="button" class="px-6 bg-main py-2 rounded-md border border-main">Filter</button>
                     </div>
                     <div class="w-fit flex gap-2 items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#eed202" width="20" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
-                        <p class="text-yellow-500 font-medium text-xs">Filter's under development</p>
+                        {{-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#eed202" width="20" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg> --}}
+                        {{-- <p class="text-yellow-500 font-medium text-xs">Filter's under development</p> --}}
                     </div>
                 </div>
                 <div id="result_div" class="w-full flex flex-wrap gap-5 h-[90%] overflow-y-auto mt-10">
@@ -176,7 +175,13 @@
                                 <img src="{{ asset('images/' . $r->image_name . '.png') }}" alt="" class="w-1/2 block mx-auto">
                             </div>
                             <div class="w-full bg-white p-5 rounded-bl-lg rounded-br-lg text-left hover:bg-[#bae6de] transition duration-100 ease-in-out">
-                                <p id="name" class="text-left text-[#383737] text-sm mb-2 font-semibold uppercase">{{ $r->name }}</p>
+                                <div class="w-full flex justify-between items-center mb-2">
+                                    <p id="name" class="text-left text-[#383737] text-sm font-semibold uppercase">{{ $r->name }}</p>
+                                    <p class=" font-medium flex items-center">
+                                        <span class="text-yellow-500 "> {{$r->final_rate}}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" fill="#eab308"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>
+                                    </p>
+                                </div>
                                 <div class="w-full flex gap-10 items-center">
                                     <div class="w-1/2">
                                         <p class="text-xs">Per sack</p>
@@ -200,11 +205,18 @@
     </div>
     <script>
         $(document).ready(function() {
+            $('#acc-btn').on('click', function() {
+                $('#drpdown').toggleClass('hidden')
+                $('#drpdown').toggleClass('flex')
+            })
+
             $('#filter').on('click', function(){
                 $('#filter_div').removeClass('hidden')
+                $('#cover').removeClass('hidden')
             })
             $('#close_modal').on('click', function(){
                 $('#filter_div').addClass('hidden')
+                $('#cover').addClass('hidden')
             })
             // Set the CSRF token for all AJAX requests
             $.ajaxSetup({
@@ -235,16 +247,19 @@
                         lat: userLat,
                         long: userLon
                     },
+                    dataType: 'json',
                     success: function(response) {
-    console.log(response);
-    // Clear the previous results in case of reloading or new filter
-    $('#result_div').empty();
-    
-    // Check if there are rice items in the response
-    if (response.riceItems && response.riceItems.length > 0) {
-        // Loop through the rice items
-        response.riceItems.forEach(function(item) {
-            // Create a new button for each rice item
+    console.log("Response received:", response);
+
+    // Ensure riceItems is an array
+    let riceItems = Object.values(response.riceItems);
+
+    console.log("Rice items after conversion:", riceItems);
+
+    if (riceItems.length > 0) {
+        $('#result_div').empty(); // Clear previous results
+
+        riceItems.forEach(function(item) {
             var riceButton = `
                 <button class="rice-button w-1/5 h-fit shadow-md"
                     data-id="${item.id}"
@@ -255,31 +270,37 @@
                         <img src="{{ asset('images/${item.image_name}.png') }}" alt="" class="w-1/2 block mx-auto">
                     </div>
                     <div class="w-full bg-white p-5 rounded-bl-lg rounded-br-lg text-left hover:bg-[#bae6de] transition duration-100 ease-in-out">
-                        <p id="name" class="text-left text-[#383737] text-sm mb-2 font-semibold uppercase">${item.name}</p>
-                        <div class="w-full flex gap-4 items-center">
+                        <div class="w-full flex justify-between items-center mb-2">
+                            <p id="name" class="text-left text-[#383737] text-sm font-semibold uppercase">${item.name}</p>
+                            <p class="font-medium flex items-center">
+                                <span class="text-yellow-500 ">${item.final_rate}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" fill="#eab308">
+                                    <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+                                </svg>
+                            </p>
+                        </div>
+                        <div class="w-full flex gap-10 items-center">
                             <div class="w-1/2">
                                 <p class="text-xs">Per sack</p>
                                 <p class="text-2xl mb-2">&#8369;<span id="per_sack">${item.per_sack}</span>.00</p>
                             </div>
                             <div class="w-1/2">
-                                <p class="text-xs">Per kg</p>
-                                <p class="text-2xl mb-2">&#8369;<span id="per_kg">${item.per_kg}</span>.00</p>
+                                <p class="text-xs">Sacks left</p>
+                                <p class="text-2xl mb-2"><span id="per_kg">${item.quantity}</span></p>
                             </div>
                         </div>
-                        <p class="text-xs text-[#383737] mb-5">${item.address}</p>
                         <p class="text-xs uppercase font-medium pb-3 border-b border-[#b3b0b0]">${item.quality}</p>
                         <p class="mt-3 text-xs mb-1">Dealer:</p>
-                        <!-- Ensure the dealer data is not null before trying to display it -->
-                        <p class="text-md uppercase font-medium">${item.dealer ? item.dealer.first_name + ' ' + item.dealer.last_name : 'Dealer info not available'}</p>
+                        <p class="text-md uppercase font-medium">${item.dealer ? item.dealer : 'Dealer info not available'}</p>
+                        <p class="text-xs text-[#383737]">${item.address}</p>
                     </div>
                 </button>
             `;
 
-            // Append the newly created button to the result div
+            // Append to the result div
             $('#result_div').append(riceButton);
         });
     } else {
-        // If no rice items found, show a message
         $('#result_div').append('<p class="text-center text-gray-500">No rice items found in your selected range.</p>');
     }
 },
@@ -344,32 +365,39 @@
                             data.forEach(function (rice) {
                                 resultHtml += `
                                     <button class="rice-button w-1/5 h-fit shadow-md"
-                                        data-id="${rice.id}"
-                                        data-name="${rice.name}" 
-                                        data-per-sack="${rice.per_sack}" 
-                                        data-per-kg="${rice.per_kg}"
-                                    >
-                                        <div class="w-full bg-[#e7e5e5] p-5 rounded-tl-lg rounded-tr-lg">
-                                            <img src="/images/${rice.image_name}.png" alt="" class="w-1/2 block mx-auto">
+                                    data-id="${rice.id}"
+                                    data-name="${rice.name}"
+                                    data-per-sack="${rice.per_sack}"
+                                    data-per-kg="${rice.per_kg}">
+                                    <div class="w-full bg-[#e7e5e5] p-5 rounded-tl-lg rounded-tr-lg">
+                                        <img src="{{ asset('images/${rice.image_name}.png') }}" alt="" class="w-1/2 block mx-auto">
+                                    </div>
+                                    <div class="w-full bg-white p-5 rounded-bl-lg rounded-br-lg text-left hover:bg-[#bae6de] transition duration-100 ease-in-out">
+                                        <div class="w-full flex justify-between items-center mb-2">
+                                            <p id="name" class="text-left text-[#383737] text-sm font-semibold uppercase">${rice.name}</p>
+                                            <p class="font-medium flex items-center">
+                                                <span class="text-yellow-500 ">${rice.final_rate}</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="14" height="14" fill="#eab308">
+                                                    <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+                                                </svg>
+                                            </p>
                                         </div>
-                                        <div class="w-full bg-white p-5 rounded-bl-lg rounded-br-lg text-left hover:bg-[#bae6de] transition duration-100 ease-in-out">
-                                            <p id="name" class="text-left text-[#383737] text-sm mb-2 font-semibold uppercase">${rice.name}</p>
-                                            <div class="w-full flex gap-4 items-center">
-                                                <div class="w-1/2">
-                                                    <p class="text-xs">Per sack</p>
-                                                    <p class="text-2xl mb-2">&#8369;<span id="per_sack">${rice.per_sack}</span>.00</p>
-                                                </div>
-                                                <div class="w-1/2">
-                                                    <p class="text-xs">Per kg</p>
-                                                    <p class="text-2xl mb-2">&#8369;<span id="per_kg">${rice.per_kg}</span>.00</p>
-                                                </div>
+                                        <div class="w-full flex gap-10 items-center">
+                                            <div class="w-1/2">
+                                                <p class="text-xs">Per sack</p>
+                                                <p class="text-2xl mb-2">&#8369;<span id="per_sack">${rice.per_sack}</span>.00</p>
                                             </div>
-                                            <p class="text-xs text-[#383737] mb-5">${rice.address}</p>
-                                            <p class="text-xs uppercase font-medium pb-3 border-b border-[#b3b0b0]">${rice.quality}</p>
-                                            <p class="mt-3 text-xs mb-1">Dealer:</p>
-                                            <p class="text-md uppercase font-medium">${rice.dealer}</p>
+                                            <div class="w-1/2">
+                                                <p class="text-xs">Sacks left</p>
+                                                <p class="text-2xl mb-2"><span id="per_kg">${rice.quantity}</span></p>
+                                            </div>
                                         </div>
-                                    </button>`;
+                                        <p class="text-xs uppercase font-medium pb-3 border-b border-[#b3b0b0]">${rice.quality}</p>
+                                        <p class="mt-3 text-xs mb-1">Dealer:</p>
+                                        <p class="text-md uppercase font-medium">${rice.dealer ? rice.dealer : 'Dealer info not available'}</p>
+                                        <p class="text-xs text-[#383737]">${rice.address}</p>
+                                    </div>
+                                </button>`;
                             });
                         } else {
                             resultHtml = '<p class="text-center w-full">No results found.</p>';

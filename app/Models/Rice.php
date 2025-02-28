@@ -17,7 +17,8 @@ class Rice extends Model
         'address',
         'quality',
         'dealer',
-        'image_name'
+        'image_name',
+        'rate'
     ];
 
     public function dealer()
